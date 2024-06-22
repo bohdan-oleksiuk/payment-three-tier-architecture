@@ -29,6 +29,10 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
     @Inject(FeesRepositoryPort) private feeRepository: FeesRepositoryPort,
   ) {}
 
+  async getAll(): Promise<PaymentEntity[] | []> {
+    return Object.values(this.payments_repo);
+  }
+
   async create(dto: CreatePaymentDto): Promise<CreatePaymentResponseType> {
     const shop = await this.shopsRepository.getOne(dto.shopId);
     if (!shop) throw new HttpException('Shop not found', HttpStatus.NOT_FOUND);

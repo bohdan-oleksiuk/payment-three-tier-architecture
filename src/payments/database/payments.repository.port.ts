@@ -5,6 +5,7 @@ import { ChangePaymentResponseType } from '../types/change-payment-response.type
 import { ProcessPaymentsDto } from '../dto/process-payments.dto';
 import { MakePayoutDto } from '../dto/make-payout.dto';
 import { MakePayoutResponseType } from '../types/make-payout-response.type';
+import { PaymentEntity } from '../entities/payment.entity';
 
 export abstract class PaymentsRepositoryPort {
   abstract create(dto: CreatePaymentDto): Promise<CreatePaymentResponseType>;
@@ -15,4 +16,5 @@ export abstract class PaymentsRepositoryPort {
     dto: ProcessPaymentsDto,
   ): Promise<ChangePaymentResponseType>;
   abstract makePayout(dto: MakePayoutDto): Promise<MakePayoutResponseType>;
+  abstract getAll(): Promise<PaymentEntity[] | []>;
 }

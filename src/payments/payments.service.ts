@@ -7,6 +7,7 @@ import { ChangePaymentResponseType } from './types/change-payment-response.type'
 import { ProcessPaymentsDto } from './dto/process-payments.dto';
 import { MakePayoutDto } from './dto/make-payout.dto';
 import { MakePayoutResponseType } from './types/make-payout-response.type';
+import { PaymentEntity } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentsService {
@@ -32,5 +33,9 @@ export class PaymentsService {
 
   async makePayout(dto: MakePayoutDto): Promise<MakePayoutResponseType> {
     return this.repository.makePayout(dto);
+  }
+
+  async getAll(): Promise<PaymentEntity[] | []> {
+    return this.repository.getAll();
   }
 }

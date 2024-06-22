@@ -43,4 +43,16 @@ export class ShopsRepository implements ShopsRepositoryPort {
       throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async updateShopBalance(id: string, balance: number): Promise<boolean> {
+    try {
+      if (this.shops_repo[id]) {
+        this.shops_repo[id].balance = balance;
+      }
+      return true;
+    } catch (e) {
+      this.logger.error(`Error while get one shop: ${e}`);
+      throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
+    }
+  }
 }

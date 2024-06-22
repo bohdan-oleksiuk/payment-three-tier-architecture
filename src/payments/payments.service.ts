@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PaymentsRepositoryPort } from './database/payments.repository.port';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { CreatePaymentResponseType } from './types/create-payment-response.type';
@@ -15,8 +15,6 @@ export class PaymentsService {
   ) {}
 
   async create(dto: CreatePaymentDto): Promise<CreatePaymentResponseType> {
-    const shop = await this.shopsRepository.getOne(dto.shopId);
-    if (!shop) throw new HttpException('Shop not found', HttpStatus.NOT_FOUND);
     return this.repository.create(dto);
   }
 

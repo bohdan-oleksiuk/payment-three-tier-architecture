@@ -6,6 +6,8 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { ProcessPaymentsDto } from './dto/process-payments.dto';
 import { ChangePaymentResponseType } from './types/change-payment-response.type';
 import { CompletePaymentsDto } from './dto/complete-payments.dto';
+import { MakePayoutResponseType } from './types/make-payout-response.type';
+import { MakePayoutDto } from './dto/make-payout.dto';
 
 @ApiTags('payments')
 @Controller('payments')
@@ -24,9 +26,7 @@ export class PaymentsController {
   @ApiResponse({ status: 201, type: ChangePaymentResponseType })
   @HttpCode(HttpStatus.CREATED)
   @Post('process')
-  processPayments(
-    @Body() dto: ProcessPaymentsDto,
-  ): Promise<ChangePaymentResponseType> {
+  process(@Body() dto: ProcessPaymentsDto): Promise<ChangePaymentResponseType> {
     return this.service.processPayments(dto);
   }
 
@@ -34,9 +34,17 @@ export class PaymentsController {
   @ApiResponse({ status: 201, type: ChangePaymentResponseType })
   @HttpCode(HttpStatus.CREATED)
   @Post('complete')
-  completePayments(
+  complete(
     @Body() dto: CompletePaymentsDto,
   ): Promise<ChangePaymentResponseType> {
     return this.service.completePayments(dto);
+  }
+
+  @ApiOperation({ summary: 'Make payout' })
+  @ApiResponse({ status: 201, type: MakePayoutResponseType })
+  @HttpCode(HttpStatus.CREATED)
+  @Post('payout')
+  makePayout(@Body() dto: MakePayoutDto): Promise<MakePayoutResponseType> {
+    return this.service.makePayout(dto);
   }
 }

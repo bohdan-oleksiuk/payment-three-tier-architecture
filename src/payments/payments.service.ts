@@ -6,6 +6,8 @@ import { ShopsRepositoryPort } from '../shops/database/shops.repository.port';
 import { CompletePaymentsDto } from './dto/complete-payments.dto';
 import { ChangePaymentResponseType } from './types/change-payment-response.type';
 import { ProcessPaymentsDto } from './dto/process-payments.dto';
+import { MakePayoutDto } from './dto/make-payout.dto';
+import { MakePayoutResponseType } from './types/make-payout-response.type';
 
 @Injectable()
 export class PaymentsService {
@@ -28,5 +30,9 @@ export class PaymentsService {
     dto: CompletePaymentsDto,
   ): Promise<ChangePaymentResponseType> {
     return this.repository.completePayments(dto);
+  }
+
+  async makePayout(dto: MakePayoutDto): Promise<MakePayoutResponseType> {
+    return this.repository.makePayout(dto);
   }
 }

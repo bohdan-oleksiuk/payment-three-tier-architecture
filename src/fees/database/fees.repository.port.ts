@@ -1,7 +1,7 @@
 import { UpdateFeesDto } from '../dto/update-fees.dto';
-import { FeesEntity } from '../entities/fees.entity';
+import { FeeEntity } from '../entities/fee.entity';
 
 export abstract class FeesRepositoryPort {
-  abstract update(dto: UpdateFeesDto): Promise<FeesEntity>;
-  abstract get(): Promise<FeesEntity>;
+  abstract update(dto: UpdateFeesDto): Promise<FeeEntity>;
+  abstract get(): Promise<FeeEntity>;
 }

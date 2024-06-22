@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FeesRepositoryPort } from './fees.repository.port';
 import { UpdateFeesDto } from '../dto/update-fees.dto';
-import { FeesEntity } from '../entities/fees.entity';
+import { FeeEntity } from '../entities/fee.entity';
 
 @Injectable()
 export class FeesRepository implements FeesRepositoryPort {
@@ -10,7 +10,7 @@ export class FeesRepository implements FeesRepositoryPort {
   private readonly logger = new Logger(FeesRepository.name);
 
   constructor() {
-    const fee = new FeesEntity();
+    const fee = new FeeEntity();
     fee.fixed_commission = 0;
     fee.commission_percentage = 0;
     fee.temporary_blocking = 0;

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class FeesEntity {
+export class FeeEntity {
   @ApiProperty()
   fixed_commission: number;
 

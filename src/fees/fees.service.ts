@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { FeesRepositoryPort } from './database/fees.repository.port';
 import { UpdateFeesDto } from './dto/update-fees.dto';
-import { FeesEntity } from './entities/fees.entity';
+import { FeeEntity } from './entities/fee.entity';
 
 @Injectable()
 export class FeesService {
@@ -9,11 +9,11 @@ export class FeesService {
     @Inject(FeesRepositoryPort) private repository: FeesRepositoryPort,
   ) {}
 
-  async get(): Promise<FeesEntity> {
+  async get(): Promise<FeeEntity> {
     return this.repository.get();
   }
 
-  async update(dto: UpdateFeesDto): Promise<FeesEntity> {
+  async update(dto: UpdateFeesDto): Promise<FeeEntity> {
     return this.repository.update(dto);
   }
 }

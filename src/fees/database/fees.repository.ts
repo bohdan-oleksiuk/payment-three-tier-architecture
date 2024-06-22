@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FeesRepositoryPort } from './fees.repository.port';
 import { UpdateFeesDto } from '../dto/update-fees.dto';
 import { FeeEntity } from '../entities/fee.entity';
@@ -25,7 +25,7 @@ export class FeesRepository implements FeesRepositoryPort {
       return this.fees_repo;
     } catch (e) {
       this.logger.error(`Error while update fee: ${e}`);
-      return null;
+      throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -34,7 +34,7 @@ export class FeesRepository implements FeesRepositoryPort {
       return this.fees_repo;
     } catch (e) {
       this.logger.error(`Error while get fee: ${e}`);
-      return null;
+      throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
     }
   }
 }

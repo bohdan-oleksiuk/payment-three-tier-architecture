@@ -2,10 +2,11 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FeesRepositoryPort } from './fees.repository.port';
 import { UpdateFeesDto } from '../dto/update-fees.dto';
 import { FeeEntity } from '../entities/fee.entity';
+import { FeesEntity } from '../../../dist/fees/entities/fees.entity';
 
 @Injectable()
 export class FeesRepository implements FeesRepositoryPort {
-  private readonly fees_repo;
+  private readonly fees_repo: FeesEntity;
 
   private readonly logger = new Logger(FeesRepository.name);
 

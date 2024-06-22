@@ -7,7 +7,7 @@ import { CreateShopResponseType } from '../types/create-shop-response.type';
 
 @Injectable()
 export class ShopsRepository implements ShopsRepositoryPort {
-  private shops_repo: ShopEntity[] = [];
+  private shops_repo = {};
   private readonly logger = new Logger(ShopsRepository.name);
 
   async create(dto: CreateShopDto): Promise<CreateShopResponseType> {
@@ -17,7 +17,7 @@ export class ShopsRepository implements ShopsRepositoryPort {
       shop.name = dto.name;
       shop.service_fee = dto.service_fee;
       shop.balance = 0;
-      this.shops_repo.push(shop);
+      this.shops_repo[shop.id] = shop;
 
       return { id: shop.id };
     } catch (e) {
@@ -28,7 +28,7 @@ export class ShopsRepository implements ShopsRepositoryPort {
 
   async getAll(): Promise<ShopEntity[] | []> {
     try {
-      return this.shops_repo;
+      return Object.values(this.shops_repo);
     } catch (e) {
       this.logger.error(`Error while get all shops: ${e}`);
       throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
@@ -37,7 +37,7 @@ export class ShopsRepository implements ShopsRepositoryPort {
 
   async getOne(id: string): Promise<ShopEntity | null> {
     try {
-      return this.shops_repo.find((i) => i.id === id);
+      return this.shops_repo[id];
     } catch (e) {
       this.logger.error(`Error while get one shop: ${e}`);
       throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);

@@ -18,7 +18,7 @@ import { ChangePaymentResponseType } from '../types/change-payment-response.type
 
 @Injectable()
 export class PaymentsRepository implements PaymentsRepositoryPort {
-  private payments_repo: PaymentEntity[] = [];
+  private payments_repo = {};
   private readonly logger = new Logger(PaymentsRepository.name);
 
   constructor(
@@ -32,7 +32,7 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
       payment.shopId = dto.shopId;
       payment.amount = dto.amount;
       payment.status = PaymentStatusType.received;
-      this.payments_repo.push(payment);
+      this.payments_repo[payment.id] = payment;
 
       return { id: payment.id };
     } catch (e) {
@@ -47,9 +47,8 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
     try {
       const { ids } = dto;
       ids.forEach((id) => {
-        const paymentIndex = this.payments_repo.findIndex((i) => i.id === id);
-        if (paymentIndex !== -1) {
-          this.payments_repo[paymentIndex].status = PaymentStatusType.processed;
+        if (this.payments_repo[id]) {
+          this.payments_repo[id].status = PaymentStatusType.processed;
         }
       });
       return { status: 'success' };
@@ -65,9 +64,8 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
     try {
       const { ids } = dto;
       ids.forEach((id) => {
-        const paymentIndex = this.payments_repo.findIndex((i) => i.id === id);
-        if (paymentIndex !== -1) {
-          this.payments_repo[paymentIndex].status = PaymentStatusType.completed;
+        if (this.payments_repo[id]) {
+          this.payments_repo[id].status = PaymentStatusType.completed;
         }
       });
       return { status: 'success' };

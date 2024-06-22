@@ -12,6 +12,9 @@ import { randomUUID } from 'crypto';
 import { PaymentStatusType } from '../types/payment-status.enum';
 import { CreatePaymentResponseType } from '../types/create-payment-response.type';
 import { ShopsRepositoryPort } from '../../shops/database/shops.repository.port';
+import { ProcessPaymentsDto } from '../dto/process-payments.dto';
+import { CompletePaymentsDto } from '../dto/complete-payments.dto';
+import { ChangePaymentResponseType } from '../types/change-payment-response.type';
 
 @Injectable()
 export class PaymentsRepository implements PaymentsRepositoryPort {
@@ -34,6 +37,42 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
       return { id: payment.id };
     } catch (e) {
       this.logger.error(`Error while create payment: ${e}`);
+      throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async processPayments(
+    dto: ProcessPaymentsDto,
+  ): Promise<ChangePaymentResponseType> {
+    try {
+      const { ids } = dto;
+      ids.forEach((id) => {
+        const paymentIndex = this.payments_repo.findIndex((i) => i.id === id);
+        if (paymentIndex !== -1) {
+          this.payments_repo[paymentIndex].status = PaymentStatusType.processed;
+        }
+      });
+      return { status: 'success' };
+    } catch (e) {
+      this.logger.error(`Error while process payments: ${e}`);
+      throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async completePayments(
+    dto: CompletePaymentsDto,
+  ): Promise<ChangePaymentResponseType> {
+    try {
+      const { ids } = dto;
+      ids.forEach((id) => {
+        const paymentIndex = this.payments_repo.findIndex((i) => i.id === id);
+        if (paymentIndex !== -1) {
+          this.payments_repo[paymentIndex].status = PaymentStatusType.completed;
+        }
+      });
+      return { status: 'success' };
+    } catch (e) {
+      this.logger.error(`Error while complete payments: ${e}`);
       throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
     }
   }

@@ -6,5 +6,5 @@ export abstract class ShopsRepositoryPort {
   abstract create(dto: CreateShopDto): Promise<CreateShopResponseType>;
   abstract getAll(): Promise<ShopEntity[] | []>;
   abstract getOne(id: string): Promise<ShopEntity | null>;
-  abstract updateShopBalance(id: string, balance: number): Promise<boolean>;
+  abstract updateShopBalance(id: string, balance: number): Promise<number>;
 }

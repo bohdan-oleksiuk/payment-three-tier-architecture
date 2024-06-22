@@ -12,5 +12,11 @@ export class PaymentEntity {
   amount: number;
 
   @ApiProperty()
+  availableAmount: number;
+
+  @ApiProperty()
+  tmpBlock: number;
+
+  @ApiProperty()
   status: PaymentStatusEnum;
 }

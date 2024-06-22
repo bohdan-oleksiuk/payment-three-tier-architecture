@@ -32,11 +32,21 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
   async create(dto: CreatePaymentDto): Promise<CreatePaymentResponseType> {
     const shop = await this.shopsRepository.getOne(dto.shopId);
     if (!shop) throw new HttpException('Shop not found', HttpStatus.NOT_FOUND);
+    const shopFee = shop.service_fee;
+    const fees = await this.feeRepository.get();
+    const fee =
+      fees.fixed_commission +
+      (dto.amount * fees.commission_percentage) / 100 +
+      (dto.amount * shopFee) / 100;
+    const availableAmount = dto.amount - fee;
+    const tmpBlocking = (dto.amount * fees.temporary_blocking) / 100;
     try {
       const payment = new PaymentEntity();
       payment.id = randomUUID();
       payment.shopId = dto.shopId;
       payment.amount = dto.amount;
+      payment.availableAmount = availableAmount;
+      payment.tmpBlock = tmpBlocking;
       payment.status = PaymentStatusType.received;
       this.payments_repo[payment.id] = payment;
       return { id: payment.id };
@@ -70,7 +80,10 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
       const { ids } = dto;
       ids.forEach((id) => {
         if (this.payments_repo[id]) {
+          const tmpSum = this.payments_repo[id].tmpBlock;
           this.payments_repo[id].status = PaymentStatusType.completed;
+          this.payments_repo[id].tmpBlock = 0;
+          this.payments_repo[id].availableAmount += tmpSum;
         }
       });
       return { status: 'success' };
@@ -83,40 +96,31 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
   async makePayout(dto: MakePayoutDto): Promise<MakePayoutResponseType> {
     const shop = await this.shopsRepository.getOne(dto.shopId);
     if (!shop) throw new HttpException('Shop not found', HttpStatus.NOT_FOUND);
-    let shopBalance = shop.balance;
-    const shopFee = shop.service_fee;
-    const fees = await this.feeRepository.get();
     let totalPayout = 0;
     const payouts = [];
 
     try {
-      Object.keys(this.payments_repo).forEach((paymentId) => {
-        const payment: PaymentEntity = this.payments_repo[paymentId];
+      const array = (Object.values(this.payments_repo) as PaymentEntity[]).sort(
+        sortFun,
+      );
+
+      for (const payment of array) {
         if (
-          payment.shopId === dto.shopId &&
-          (payment.status === 'processed' || payment.status === 'completed')
+          payment.status === PaymentStatusType.completed ||
+          payment.status === PaymentStatusType.processed
         ) {
-          const amount = payment.amount;
-          const fee =
-            fees.fixed_commission +
-            (amount * fees.commission_percentage) / 100 +
-            (amount * shopFee) / 100;
-          let availableAmount = amount - fee;
-
-          if (payment.status === 'processed') {
-            availableAmount -= (amount * fees.temporary_blocking) / 100;
+          if (payment.status === PaymentStatusType.completed) {
+            this.payments_repo[payment.id].status = PaymentStatusType.success;
           }
-
-          if (shopBalance >= availableAmount) {
-            shopBalance -= availableAmount;
-            payouts.push({ id: paymentId, amount: availableAmount });
-            totalPayout += availableAmount;
+          const sum = this.payments_repo[payment.id].availableAmount;
+          if (sum > 0) {
+            this.payments_repo[payment.id].availableAmount = 0;
+            await this.shopsRepository.updateShopBalance(dto.shopId, sum);
+            totalPayout += sum;
+            payouts.push({ payment_id: payment.id, amount: sum });
           }
-          //TODO: add else logic
         }
-      });
-
-      await this.shopsRepository.updateShopBalance(dto.shopId, shopBalance);
+      }
 
       return {
         total_payout: totalPayout,
@@ -127,4 +131,20 @@ export class PaymentsRepository implements PaymentsRepositoryPort {
       throw new HttpException('Something went wrong!', HttpStatus.BAD_REQUEST);
     }
   }
+}
+
+function sortFun(a: PaymentEntity, b: PaymentEntity): number {
+  if (
+    a.status === PaymentStatusType.completed &&
+    b.status === PaymentStatusType.completed
+  ) {
+    return 0;
+  }
+  if (a.status === PaymentStatusType.completed) {
+    return -1;
+  }
+  if (b.status === PaymentStatusType.completed) {
+    return 1;
+  }
+  return 0;
 }

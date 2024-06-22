@@ -14,5 +14,6 @@ const repositories: Provider[] = [
   imports: [FeesModule, ShopsModule],
   providers: [...repositories, PaymentsService],
   controllers: [PaymentsController],
+  exports: [...repositories],
 })
 export class PaymentsModule {}
